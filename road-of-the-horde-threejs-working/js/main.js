@@ -95,4 +95,7 @@ function spawnCoin(){const c=new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.3,0
 
 // HUD update function
 function updateHUD(){if(gameState!=='play')return;$('scoreText').textContent=score;$('comboCount').textContent=combo;if(combo>1){$('comboWrap').classList.remove('hidden');$('comboWrap').style.animation='none';$('comboWrap').offsetHeight;$('comboWrap').style.animation='pulse .2s ease-out'}else{$('comboWrap').classList.add('hidden')}if(shieldActive){$('shieldIndicator').classList.remove('hidden')}else{$('shieldIndicator').classList.add('hidden')}if(slowMoActive){$('slowmoIndicator').classList.remove('hidden')}else{$('slowmoIndicator').classList.add('hidden')}if(rapidFireActive){$('rapidFireIndicator').classList.remove('hidden')}else{$('rapidFireIndicator').classList.add('hidden')}if(magnetActive){$('magnetIndicator').classList.remove('hidden')}else{$('magnetIndicator').classList.add('hidden')}if(freezeActive){$('freezeIndicator').classList.remove('hidden')}else{$('freezeIndicator').classList.add('hidden')}}
+
+// Экспортируем init в глобальную область видимости для index.html
+window.init = init;
 })();
