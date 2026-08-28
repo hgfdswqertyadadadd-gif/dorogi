@@ -48,5 +48,13 @@
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script src="js/yandex.js"></script>
 <script src="js/main.js"></script>
+<script>
+  // Ждём полной загрузки DOM перед инициализацией игры
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof init === 'function') {
+      init();
+    }
+  });
+</script>
 </body>
 </html>
