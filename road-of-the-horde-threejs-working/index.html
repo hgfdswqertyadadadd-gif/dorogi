@@ -45,83 +45,8 @@
   </div>
   <div id="adButtonWrap" class="ad-wrap hidden"><button id="adBtn" class="ad-btn">▶ БОНУС ×2</button></div>
 </div>
-<script>
-(function () {
-  "use strict";
-
-  function loadClassic(src, onload, onerror) {
-    var s = document.createElement("script");
-    s.src = src;
-    s.async = false;
-    s.onload = onload || function(){};
-    s.onerror = onerror || function(){};
-    document.head.appendChild(s);
-  }
-
-  // Yandex SDK is loaded independently and never blocks the game.
-  loadClassic("https://sdk.games.s3.yandex.net/sdk.js", function () {
-    console.log("Yandex Games SDK loaded");
-  }, function () {
-    console.warn("Yandex Games SDK unavailable in local preview.");
-  });
-
-  // r160+ no longer ships build/three.min.js. Use the official ESM build.
-  var threeUrls = [
-    "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
-    "https://unpkg.com/three@0.180.0/build/three.module.js"
-  ];
-
-  function loadThree(i) {
-    if (i >= threeUrls.length) {
-      showThreeError();
-      return;
-    }
-
-    import(threeUrls[i]).then(function (THREE) {
-      window.THREE = THREE;
-      console.log("Three.js loaded:", THREE.REVISION);
-      loadClassic("js/yandex.js", function () {
-        loadClassic("js/main.js", function () {
-          window.dispatchEvent(new Event("road-horde-ready"));
-        }, showGameError);
-      }, function () {
-        // Yandex bridge is optional locally.
-        loadClassic("js/main.js", function () {
-          window.dispatchEvent(new Event("road-horde-ready"));
-        }, showGameError);
-      });
-    }).catch(function (err) {
-      console.warn("Three CDN failed:", threeUrls[i], err);
-      loadThree(i + 1);
-    });
-  }
-
-  function showThreeError() {
-    var menu = document.getElementById("menu");
-    if (menu) {
-      menu.innerHTML =
-        '<div class="panel">' +
-        '<h2>НЕ УДАЛОСЬ ЗАГРУЗИТЬ 3D</h2>' +
-        '<p>Не удалось получить Three.js с CDN. Открой F12 → Console, если это повторится.</p>' +
-        '<button class="primary" onclick="location.reload()">ОБНОВИТЬ</button>' +
-        '</div>';
-    }
-  }
-
-  function showGameError() {
-    var menu = document.getElementById("menu");
-    if (menu) {
-      menu.innerHTML =
-        '<div class="panel">' +
-        '<h2>ОШИБКА ЗАПУСКА</h2>' +
-        '<p>Не удалось запустить игровой код. Обнови страницу.</p>' +
-        '<button class="primary" onclick="location.reload()">ОБНОВИТЬ</button>' +
-        '</div>';
-    }
-  }
-
-  loadThree(0);
-})();
-</script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script src="js/yandex.js"></script>
+<script src="js/main.js"></script>
 </body>
 </html>
