@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="theme-color" content="#0b0d10">
+  <title>Road of the Horde — 3D</title>
+  <link rel="stylesheet" href="FixLongTap.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="game">
+  <canvas id="scene"></canvas>
+  <div id="hud" class="hidden">
+    <div class="topbar">
+      <div class="pill army-pill"><span class="army-icon">👥</span><b id="armyCount">8</b></div>
+      <div class="wave-pill"><small>ВОЛНА</small><b id="waveText">1</b></div>
+      <button id="pauseBtn" class="icon-btn" aria-label="Пауза">Ⅱ</button>
+    </div>
+    <div class="boss-wrap hidden" id="bossWrap">
+      <div class="boss-title">☠ НЕЖЕЛЕЗНАЯ ТОЛСТУШКА <b id="bossHpText">1000</b></div>
+      <div class="boss-bar"><div id="bossHpBar"></div></div>
+    </div>
+    <div class="crosshair hidden" id="crosshair">+</div>
+    <div class="hint" id="hint">Веди толпу пальцем</div>
+  </div>
+  <div id="menu" class="overlay">
+    <div class="logo">ROAD<br><span>OF THE HORDE</span></div>
+    <div class="tagline">3D CROWD RUNNER</div>
+    <button id="playBtn" class="primary">ИГРАТЬ</button>
+    <div class="mini">Собери армию · выбирай ворота · уничтожай орду</div>
+  </div>
+  <div id="pauseOverlay" class="overlay hidden">
+    <div class="panel"><h2>ПАУЗА</h2><button id="resumeBtn" class="primary">ПРОДОЛЖИТЬ</button><button id="pauseRestart" class="secondary">ЗАНОВО</button></div>
+  </div>
+  <div id="gameoverOverlay" class="overlay hidden">
+    <div class="panel"><div class="result-small">ВОЛНА</div><h2 id="resultWave">1</h2><div class="result-stat">Армия: <b id="resultArmy">0</b></div><button id="restartBtn" class="primary">ЕЩЁ РАЗ</button></div>
+  </div>
+  <div id="adButtonWrap" class="ad-wrap hidden"><button id="adBtn" class="ad-btn">▶ БОНУС ×2</button></div>
+</div>
+<script>
+(function () {
+  "use strict";
+
+  function loadClassic(src, onload, onerror) {
+    var s = document.createElement("script");
+    s.src = src;
+    s.async = false;
+    s.onload = onload || function(){};
+    s.onerror = onerror || function(){};
+    document.head.appendChild(s);
+  }
+
+  // Yandex SDK is loaded independently and never blocks the game.
+  loadClassic("https://sdk.games.s3.yandex.net/sdk.js", function () {
+    console.log("Yandex Games SDK loaded");
+  }, function () {
+    console.warn("Yandex Games SDK unavailable in local preview.");
+  });
+
+  // r160+ no longer ships build/three.min.js. Use the official ESM build.
+  var threeUrls = [
+    "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+    "https://unpkg.com/three@0.180.0/build/three.module.js"
+  ];
+
+  function loadThree(i) {
+    if (i >= threeUrls.length) {
+      showThreeError();
+      return;
+    }
+
+    import(threeUrls[i]).then(function (THREE) {
+      window.THREE = THREE;
+      console.log("Three.js loaded:", THREE.REVISION);
+      loadClassic("js/yandex.js", function () {
+        loadClassic("js/main.js", function () {
+          window.dispatchEvent(new Event("road-horde-ready"));
+        }, showGameError);
+      }, function () {
+        // Yandex bridge is optional locally.
+        loadClassic("js/main.js", function () {
+          window.dispatchEvent(new Event("road-horde-ready"));
+        }, showGameError);
+      });
+    }).catch(function (err) {
+      console.warn("Three CDN failed:", threeUrls[i], err);
+      loadThree(i + 1);
+    });
+  }
+
+  function showThreeError() {
+    var menu = document.getElementById("menu");
+    if (menu) {
+      menu.innerHTML =
+        '<div class="panel">' +
+        '<h2>НЕ УДАЛОСЬ ЗАГРУЗИТЬ 3D</h2>' +
+        '<p>Не удалось получить Three.js с CDN. Открой F12 → Console, если это повторится.</p>' +
+        '<button class="primary" onclick="location.reload()">ОБНОВИТЬ</button>' +
+        '</div>';
+    }
+  }
+
+  function showGameError() {
+    var menu = document.getElementById("menu");
+    if (menu) {
+      menu.innerHTML =
+        '<div class="panel">' +
+        '<h2>ОШИБКА ЗАПУСКА</h2>' +
+        '<p>Не удалось запустить игровой код. Обнови страницу.</p>' +
+        '<button class="primary" onclick="location.reload()">ОБНОВИТЬ</button>' +
+        '</div>';
+    }
+  }
+
+  loadThree(0);
+})();
+</script>
+</body>
+</html>
